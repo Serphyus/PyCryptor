@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 
 from Crypto.Cipher import AES
 
-from .utils import validate_path
-from .signature import (
+from utils import validate_path
+from signature import (
 	create_signature,
 	verify_signature
 )
