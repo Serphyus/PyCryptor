@@ -16,6 +16,9 @@ def main() -> None:
 
 	args = parser.parse_args()
 
+	if not args.paths:
+		parser.error("no filepaths provided")
+
 	if args.encrypt and args.decrypt:
 		parser.error("too many modes selected")
 	
