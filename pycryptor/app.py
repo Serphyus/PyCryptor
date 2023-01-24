@@ -1,8 +1,6 @@
-import os
 from pathlib import Path
-from typing import Union
 
-from rich.progress import Progress, TextColumn
+from rich.progress import Progress
 
 from pycryptor.utils import hash_password, find_pattern_match
 from pycryptor.file_io import EncryptIO, DecryptIO
