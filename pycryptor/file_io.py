@@ -17,21 +17,6 @@ class _BaseIO(ABC):
 			buffer_size: int = 4096
 		) -> None:
 
-		if not isinstance(aes_key, bytes):
-			raise TypeError("aes_key must be bytes")
-
-		if len(aes_key) not in AES.key_size:
-			raise ValueError(f"aes_key must be a lenght in {AES.key_size}")
-
-		validate_path(file_path)
-
-		if not isinstance(buffer_size, int):
-			raise TypeError("buffer_size must be an int")
-		
-		# buffer size must be a product value of the AES.block_size
-		if (buffer_size % AES.block_size) != 0:
-			raise ValueError(f"buffer_size must be a product of {AES.block_size}")
-
 		self._aes_key = aes_key
 		self._file_path = file_path
 		self._buffer_size = buffer_size

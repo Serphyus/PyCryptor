@@ -1,22 +1,48 @@
 from pathlib import Path
+from argparse import ArgumentParser
 
+from Crypto.Cipher import AES
 from rich.progress import Progress
 
-from pycryptor.utils import hash_password, find_pattern_match
 from pycryptor.file_io import EncryptIO, DecryptIO
+from pycryptor.utils import (
+	hash_password,
+	find_pattern_match,
+	validate_path
+)
 
 
 class App:
 	ENCRYPT = 0
 	DECRYPT = 1
 
-	def __init__(self, args: object) -> None:
+	def __init__(self, parser: ArgumentParser) -> None:
+		args = parser.parse_args()
+
+		if not args.paths:
+			parser.error("no filepaths provided")
+
+		if args.encrypt and args.decrypt:
+			parser.error("too many modes selected")
+		
+		if args.key is None:
+			parser.error("missing key argument when decrypting")
+
+		if (args.buffer_size % AES.block_size):
+			parser.error(f"buffer_size must be a product of {AES.block_size}")
+
 		path_args = []
 		for path in args.paths:
 			matches = find_pattern_match(path)
 
 			if not matches:
 				matches = [Path(path)]
+
+			for match in matches:
+				try:
+					validate_path(match)
+				except OSError as e:
+					parser.error(e)
 
 			path_args.extend(matches)
 		
