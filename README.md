@@ -33,7 +33,7 @@ $ pycryptor -e -k 12345 test_files/*
 
 - :unlock: Encrypting files
 ```
-$ pycryptor -e -k 12345 test_files/*
+$ pycryptor -d -k 12345 test_files/*
  ╔═════════════════════════════════════════════════════════╗
  ║      ____        ______                 __              ║
  ║     / __ \__  __/ ____/______  ______  / /_____  _____  ║
