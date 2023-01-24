@@ -5,11 +5,8 @@ from abc import ABC, abstractmethod
 
 from Crypto.Cipher import AES
 
-from utils import validate_path
-from signature import (
-	create_signature,
-	verify_signature
-)
+from pycryptor.utils import validate_path
+from pycryptor.signature import create_signature, verify_signature
 
 
 class _BaseIO(ABC):
