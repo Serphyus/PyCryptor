@@ -30,6 +30,8 @@ def verify_signature(aes_key: bytes, nonce: bytes, tag: bytes, ciphertext: bytes
 	- `tag` (bytes): 16 byte authentication tag
 	- `ciphertext` (bytes): 16 byte encrypted block
 	
+	Raises:
+	- `ValueError`: the signature can't be verified by the key
 	"""
 	cipher = AES.new(aes_key, AES.MODE_EAX, nonce)
 	plaintext = cipher.decrypt_and_verify(ciphertext, tag)
