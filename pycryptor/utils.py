@@ -1,7 +1,14 @@
 from glob import glob
 from pathlib import Path
+from hashlib import sha256
 from contextlib import suppress
 from typing import Union, List
+
+
+def hash_password(password: bytes) -> bytes:
+	for _ in range(100000):
+		password = sha256(password).digest()
+	return password
 
 
 def find_pattern_match(pattern: str) -> Union[List[Path], None]:
