@@ -76,27 +76,16 @@ class App:
 			f" buffer size    : {self._buffer_size}\n"
 		)
 
-	def _file_task(self, progress: Progress, file_path: Path) -> None:
-		if self._mode == self.ENCRYPT:
-			crypt_file = EncryptIO(self._key, file_path, self._buffer_size)
-		else:
-			crypt_file = DecryptIO(self._key, file_path, self._buffer_size)
-
-		task = progress.add_task(
-			f" {file_path.name}",
-			total=crypt_file.size
-		)
-
-		while not crypt_file.finished:
-			advance_size = crypt_file.handle_buffer()
-			progress.update(task, advance=advance_size)
-		
-		crypt_file.close()
-
 	def run(self) -> None:
 		self._display_logo()
 		self._display_params()
 
 		with Progress() as progress:
 			for path in self._paths:
-				self._file_task(progress, path)
+				if self._mode == self.ENCRYPT:
+					crypt_file = EncryptIO(self._key, path, self._buffer_size)
+				else:
+					crypt_file = DecryptIO(self._key, path, self._buffer_size)
+
+				crypt_file.create_task_handler(progress)
+				crypt_file.close()

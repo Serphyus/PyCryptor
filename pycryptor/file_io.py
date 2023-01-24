@@ -4,6 +4,7 @@ from pathlib import Path
 from abc import ABC, abstractmethod
 
 from Crypto.Cipher import AES
+from rich.progress import Progress
 
 from pycryptor.utils import validate_path
 from pycryptor.signature import create_signature, verify_signature
@@ -129,11 +130,18 @@ class EncryptIO(_BaseIO):
 		
 		return len(buffer)
 
-	def handle_buffer(self) -> int:
+	def create_task_handler(self, progress: Progress) -> None:
 		if self._finished:
 			raise IOError("file has already been encrypted")
 		
-		return self._encrypt_buffer()
+		task = progress.add_task(
+			f" {self._file_path.name}",
+			total=self.size
+		)
+
+		while not self._finished:
+			advance_size = self._encrypt_buffer()
+			progress.update(task, advance=advance_size)
 
 
 class DecryptIO(_BaseIO):
@@ -220,8 +228,15 @@ class DecryptIO(_BaseIO):
 		
 		return len(buffer)
 
-	def handle_buffer(self) -> int:
+	def create_task_handler(self, progress: Progress) -> None:
 		if self._finished:
 			raise IOError("file has already been decrypted")
 
-		return self._decrypt_buffer()
+		task = progress.add_task(
+			f" {self._file_path.name}",
+			total=self.size
+		)
+
+		while not self._finished:
+			advance_size = self._decrypt_buffer()
+			progress.update(task, advance=advance_size)
