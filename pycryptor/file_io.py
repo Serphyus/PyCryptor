@@ -192,8 +192,15 @@ class DecryptIO(_BaseIO):
 		# removes the header lenght from the total_size
 		self._total_size -= 56
 
-		self._read_header()
-		self._get_init_vector()
+		try:
+			self._read_header()
+		except OSError:
+			raise OSError("unable to read encryption header")
+
+		try:
+			self._get_init_vector()
+		except ValueError:
+			raise ValueError("unable to verify signature with encryption key")
 
 		# move offset back to the beginning of the file
 		# after having read and decrypted the header
