@@ -109,6 +109,8 @@ class EncryptIO(_BaseIO):
 
 			# move back to the start of the file
 			self._file.seek(0)
+		else:		
+			self._padded_size = self._total_size
 
 	def _setup_hook(self) -> None:
 		# generate a random initialization vector to be
@@ -145,7 +147,7 @@ class EncryptIO(_BaseIO):
 		
 		return len(buffer)
 
-	def encrypt_buffer(self) -> int:
+	def handle_buffer(self) -> int:
 		if self._finished:
 			raise IOError("file has already been encrypted")
 		
@@ -159,7 +161,7 @@ class DecryptIO(_BaseIO):
 
 	def _read_header(self) -> None:
 		# move to header start
-		self._file.seek(self._total_size - 56)
+		self._file.seek(self._total_size)
 
 		# original unencrypted file size in header as unsigned long long
 		plaintext_size = struct.unpack(">Q", self._file.read(8))[0]
@@ -187,6 +189,9 @@ class DecryptIO(_BaseIO):
 		)
 	
 	def _setup_hook(self) -> None:
+		# removes the header lenght from the total_size
+		self._total_size -= 56
+
 		self._read_header()
 		self._get_init_vector()
 
@@ -195,11 +200,9 @@ class DecryptIO(_BaseIO):
 		self._file.seek(0)
 
 	def _read_buffer(self) -> bytes:
-		file_end = self._total_size - 56
-
 		# only read the entire buffer_size if the file end has not been
 		# reached to prevent reading the header as part of the next buffer
-		current_buffer_size = min(file_end - self._file.tell(), self._buffer_size)
+		current_buffer_size = min(self._total_size - self._file.tell(), self._buffer_size)
 
 		buffer = self._file.read(current_buffer_size)
 
@@ -228,7 +231,7 @@ class DecryptIO(_BaseIO):
 		
 		return len(buffer)
 
-	def decrypt_buffer(self) -> int:
+	def handle_buffer(self) -> int:
 		if self._finished:
 			raise IOError("file has already been decrypted")
 
