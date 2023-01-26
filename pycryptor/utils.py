@@ -6,6 +6,12 @@ from typing import Union, List
 
 
 def hash_password(password: bytes) -> bytes:
+	"""
+	creates a 32 byte sha256 hash from password with 100000 iterations
+
+	Args:
+	- `password` (bytes): A sequence of bytes of any lenght
+	"""
 	for _ in range(100000):
 		password = sha256(password).digest()
 	return password
